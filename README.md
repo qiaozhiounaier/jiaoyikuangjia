@@ -2,11 +2,13 @@
 
 This repository provides a minimal multi-asset trading framework suitable for institutional-style experimentation. It supports automated data acquisition, strategy implementation, backtesting, and result visualization.
 
+The design is inspired by the structure of the [Chan](https://github.com/nextang/Chan) project and focuses on easily extending to multiple instruments.
+
 ## Features
 
-- Fetch historical price data using `yfinance` or local CSV files.
+- Fetch historical price data using `yfinance` or local CSV files with caching to speed up repeated runs.
 - Define trading strategies using a clear class-based structure.
-- Run vectorized backtests with capital tracking.
+- Run vectorized backtests with capital tracking and automatic portfolio aggregation.
 - Plot equity curves for individual tickers.
 
 ## Quickstart
@@ -31,11 +33,12 @@ from trading_framework.strategy.moving_average import MovingAverageCrossStrategy
 from trading_framework.backtest.backtester import Backtester
 from trading_framework.visualization.plot_results import plot_equity_curve
 
-provider = DataProvider(source="local")
+provider = DataProvider()
 data = provider.get_price_data(["AAPL", "GOOG"], "2024-01-01", "2024-01-05")
 strategy = MovingAverageCrossStrategy(short=2, long=3)
 signals = strategy.generate_signals(data)
 backtester = Backtester(data, signals)
 results = backtester.run()
 plot_equity_curve(results, "AAPL")
+print(results[["Date", "Portfolio_Equity"]].drop_duplicates().tail())
 ```

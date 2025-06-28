@@ -13,3 +13,11 @@ def test_backtest_runs():
     results = backtester.run()
     assert not results.empty
     assert "Equity" in results.columns
+    assert "Portfolio_Equity" in results.columns
+
+
+def test_data_provider_local():
+    provider = DataProvider(source="local")
+    data = provider.get_price_data(["AAPL"], start="2024-01-01", end="2024-01-05")
+    assert not data.empty
+    assert set(data["Ticker"]) == {"AAPL"}
