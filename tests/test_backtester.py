@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 from trading_framework.data.data_provider import DataProvider
 from trading_framework.strategy.moving_average import MovingAverageCrossStrategy
 from trading_framework.backtest.backtester import Backtester
@@ -18,6 +19,12 @@ def test_backtest_runs():
     assert not results.empty
     assert "Equity" in results.columns
     assert "Portfolio_Equity" in results.columns
+    a_alloc = results.loc[results["Ticker"] == "AAPL", "Allocation"].iloc[0]
+    g_alloc = results.loc[results["Ticker"] == "GOOG", "Allocation"].iloc[0]
+    assert a_alloc == pytest.approx(60000)
+    assert g_alloc == pytest.approx(40000)
+    first_equity = results.loc[results["Ticker"] == "AAPL", "Equity"].iloc[0]
+    assert first_equity == pytest.approx(a_alloc)
 
 
 def test_data_provider_local():

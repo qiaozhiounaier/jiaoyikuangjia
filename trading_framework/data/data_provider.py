@@ -32,6 +32,13 @@ class DataProvider:
         df.to_csv(self._cache_path(ticker), index=False)
 
     def get_price_data(self, tickers: List[str], start: str, end: str) -> pd.DataFrame:
+        """Return OHLC price data for the requested tickers.
+
+        Data is pulled from ``yfinance`` when available. If downloading fails or
+        ``source`` is set to ``"local"``, cached or bundled CSV files are used
+        instead. The returned DataFrame contains a ``Ticker`` column and is
+        sorted chronologically.
+        """
         frames = []
         for ticker in tickers:
             data = None
@@ -54,5 +61,6 @@ class DataProvider:
             if data is not None:
                 frames.append(data)
         if frames:
-            return pd.concat(frames)
+            result = pd.concat(frames).sort_values(["Date", "Ticker"]).reset_index(drop=True)
+            return result
         raise RuntimeError("No data source available")
